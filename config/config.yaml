@@ -1,0 +1,154 @@
+# Market Monitor Configuration
+
+# --- Public figures whose statements can move markets ---
+# Add more entries here later to expand coverage. Each figure needs at least
+# one source. "truth_social_mirror" works for anyone who posts there;
+# "news_mentions" is a fallback that works for literally anyone via NewsAPI.
+figures:
+  - name: "Donald Trump"
+    sources:
+      - type: "truth_social_mirror"
+        handle: "realDonaldTrump"
+        url: "https://trumpstruth.org/feed"   # free mirror, polled as RSS/JSON
+      - type: "news_mentions"
+        query: "Trump tariffs OR Trump Fed OR Trump statement"
+    relevance_keywords:
+      - "tariff"
+      - "China"
+      - "Federal Reserve"
+      - "interest rate"
+      - "sanctions"
+      - "trade deal"
+
+  - name: "Kevin Warsh"
+    # Fed Chair. His statements on rates/inflation move bonds, the dollar,
+    # and broad equity indices.
+    sources:
+      - type: "news_mentions"
+        query: "Kevin Warsh Federal Reserve rate OR Warsh Fed statement"
+    relevance_keywords:
+      - "rate cut"
+      - "rate hike"
+      - "inflation"
+      - "interest rate"
+      - "FOMC"
+      - "monetary policy"
+
+  - name: "Elon Musk"
+    # Not a major forex driver -- kept disabled here since this config is
+    # forex-focused. Re-enable (remove `enabled: false`) if you ever branch
+    # into crypto/stocks again, since Tesla/Dogecoin moves are his lane.
+    enabled: false
+    sources:
+      - type: "news_mentions"
+        query: "Elon Musk Tesla OR Musk SpaceX OR Musk statement"
+    relevance_keywords:
+      - "Tesla"
+      - "Dogecoin"
+      - "SpaceX"
+      - "X Corp"
+      - "production"
+      - "delivery numbers"
+
+  - name: "Scott Bessent"
+    # Treasury Secretary -- moves on trade policy, tariffs, debt issuance,
+    # and dollar/bond commentary.
+    sources:
+      - type: "news_mentions"
+        query: "Scott Bessent Treasury statement OR Bessent tariffs"
+    relevance_keywords:
+      - "tariff"
+      - "trade deal"
+      - "Treasury"
+      - "debt"
+      - "dollar"
+      - "sanctions"
+
+  - name: "Christine Lagarde"
+    # ECB President -- moves EUR pairs and European equity indices on
+    # rate/policy commentary.
+    sources:
+      - type: "news_mentions"
+        query: "Christine Lagarde ECB rate OR Lagarde statement"
+    relevance_keywords:
+      - "rate cut"
+      - "rate hike"
+      - "eurozone"
+      - "inflation"
+      - "ECB"
+
+  - name: "Kazuo Ueda"
+    # Bank of Japan Governor -- his statements move USD/JPY directly,
+    # especially around yield curve control and intervention signals.
+    sources:
+      - type: "news_mentions"
+        query: "Kazuo Ueda Bank of Japan rate OR BOJ statement"
+    relevance_keywords:
+      - "rate cut"
+      - "rate hike"
+      - "yen"
+      - "intervention"
+      - "yield curve"
+      - "BOJ"
+
+  - name: "Andrew Bailey"
+    # Bank of England Governor -- moves GBP pairs on UK rate/inflation
+    # commentary.
+    sources:
+      - type: "news_mentions"
+        query: "Andrew Bailey Bank of England rate OR BOE statement"
+    relevance_keywords:
+      - "rate cut"
+      - "rate hike"
+      - "pound"
+      - "inflation"
+      - "BOE"
+
+  # Add more figures here following the same pattern. news_mentions works
+  # for literally anyone (no API/scraper needed for them specifically);
+  # add a truth_social_mirror source too for figures who post there.
+
+# --- Economic calendar (ForexFactory red/orange/yellow events) ---
+calendar:
+  source: "forexfactory"
+  min_impact: "medium"   # low | medium | high  -> alert threshold
+  pre_alert_minutes: 15  # warn this many minutes before a high-impact event
+
+# --- Price/volume spike detection ---
+assets:
+  stocks:
+    enabled: false
+    tickers: ["SPY", "QQQ", "AAPL", "NVDA", "TSLA"]
+    provider: "alpha_vantage"
+  crypto:
+    enabled: false
+    tickers: ["bitcoin", "ethereum", "solana"]
+    provider: "coingecko"
+  forex:
+    enabled: true
+    pairs: ["EURUSD", "USDJPY", "GBPUSD", "USDCAD", "AUDUSD", "USDCHF", "NZDUSD"]
+    provider: "alpha_vantage"
+
+spike_thresholds:
+  price_pct_change: 1.5     # % move within window to flag
+  window_minutes: 15
+  volume_multiplier: 2.0    # volume vs rolling average
+
+# --- Notifications ---
+notifications:
+  telegram:
+    enabled: true
+  email:
+    enabled: true
+  sms:
+    enabled: false
+    # SMS costs money per message (Twilio). Telegram is free and just as
+    # instant on your phone, so SMS is off by default. Flip to true if you
+    # decide it's worth it -- gated to high-confidence alerts only either way.
+    min_confidence: "high"
+
+# --- Polling cadence ---
+polling:
+  price_check_minutes: 5
+  social_check_minutes: 3
+  calendar_check_minutes: 30
