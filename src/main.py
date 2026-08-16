@@ -53,11 +53,12 @@ def run_cycle(cfg: dict):
         return  # nothing new, skip the analyzer call to save API spend
 
     insight = analyzer.analyze_signals(price_spikes, figure_hits, calendar_alerts)
-    if insight and insight.get("is_noteworthy"):
-        print(f"[{datetime.now()}] NOTEWORTHY INSIGHT: {insight}")
+    if insight and insight.get("is_noteworthy") and insight.get("confidence") == "high":
+        print(f"[{datetime.now()}] NOTEWORTHY HIGH-CONFIDENCE INSIGHT: {insight}")
         notifier.dispatch(insight, cfg)
     elif insight:
-        print(f"[{datetime.now()}] insight generated but not noteworthy, skipping alert")
+        print(f"[{datetime.now()}] insight generated but not noteworthy/high-confidence, skipping alert: "
+              f"noteworthy={insight.get('is_noteworthy')} confidence={insight.get('confidence')}")
 
 
 def main():
