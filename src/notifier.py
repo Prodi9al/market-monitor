@@ -94,7 +94,6 @@ def dispatch(insight: dict, cfg: dict):
         send_email(subject=f"Market Alert: {insight.get('pair', 'Trade idea')}", message=message)
 
     if notif_cfg["sms"]["enabled"]:
-        min_conf = CONFIDENCE_RANK[notif_cfg["sms"].get("min_confidence", "high")]
-        actual_conf = CONFIDENCE_RANK.get(insight.get("confidence", "low"), 1)
-        if actual_conf >= min_conf:
-            send_sms(message)
+        # dispatch() is only invoked for high-confidence, noteworthy insights
+        # (see main.py), so no additional confidence gate is needed here.
+        send_sms(message)
