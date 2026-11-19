@@ -1,5 +1,7 @@
 # Market Monitor
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Always-on market monitoring tool. Watches price/volume spikes (stocks,
 crypto, forex), statements from market-moving public figures and officials
 (Trump, Fed Chair Kevin Warsh, Treasury Secretary Scott Bessent, ECB
